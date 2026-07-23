@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: HospitaManagmentSystemDemo
+  datasource:
+    url: jdbc:mysql://localhost:3306/hms_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+server:
+  port: 9091
+
+hms:
+  staff:
+    employee-code-prefix: HMS-STF
+    minimum-working-age: 18
+    maximum-page-size: 100

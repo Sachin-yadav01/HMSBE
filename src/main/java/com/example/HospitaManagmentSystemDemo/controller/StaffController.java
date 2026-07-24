@@ -16,7 +16,6 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -41,7 +40,6 @@ public class StaffController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('STAFF_CREATE')")
     @Operation(summary = "Register a new staff member")
     public ResponseEntity<ApiResponse<StaffResponse>> registerStaff(@Valid @RequestBody StaffCreateRequest request) {
         StaffResponse response = staffService.createStaff(request);
@@ -56,7 +54,6 @@ public class StaffController {
     }
 
     @GetMapping("/{staffId}")
-    @PreAuthorize("hasAuthority('STAFF_VIEW')")
     @Operation(summary = "Get a staff member by ID")
     public ResponseEntity<ApiResponse<StaffResponse>> getStaffById(@PathVariable Long staffId) {
         StaffResponse response = staffService.getStaffById(staffId);
@@ -64,7 +61,6 @@ public class StaffController {
     }
 
     @GetMapping("/employee-code/{employeeCode}")
-    @PreAuthorize("hasAuthority('STAFF_VIEW')")
     @Operation(summary = "Get a staff member by Employee Code")
     public ResponseEntity<ApiResponse<StaffResponse>> getStaffByEmployeeCode(@PathVariable String employeeCode) {
         StaffResponse response = staffService.getStaffByEmployeeCode(employeeCode);
@@ -72,7 +68,6 @@ public class StaffController {
     }
 
     @PutMapping("/{staffId}")
-    @PreAuthorize("hasAuthority('STAFF_UPDATE')")
     @Operation(summary = "Update all editable fields of a staff member")
     public ResponseEntity<ApiResponse<StaffResponse>> updateStaff(
             @PathVariable Long staffId,
@@ -82,7 +77,6 @@ public class StaffController {
     }
 
     @PatchMapping("/{staffId}")
-    @PreAuthorize("hasAuthority('STAFF_UPDATE')")
     @Operation(summary = "Partially update a staff member")
     public ResponseEntity<ApiResponse<StaffResponse>> patchStaff(
             @PathVariable Long staffId,
@@ -92,7 +86,6 @@ public class StaffController {
     }
 
     @PatchMapping("/{staffId}/status")
-    @PreAuthorize("hasAuthority('STAFF_UPDATE')")
     @Operation(summary = "Update a staff member's status")
     public ResponseEntity<ApiResponse<StaffResponse>> updateStaffStatus(
             @PathVariable Long staffId,
@@ -102,7 +95,6 @@ public class StaffController {
     }
 
     @PatchMapping("/{staffId}/activation")
-    @PreAuthorize("hasAuthority('STAFF_UPDATE')")
     @Operation(summary = "Activate or deactivate a staff member")
     public ResponseEntity<ApiResponse<StaffResponse>> updateStaffActivation(
             @PathVariable Long staffId,
@@ -112,7 +104,6 @@ public class StaffController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('STAFF_VIEW')")
     @Operation(summary = "Search and filter staff members with pagination")
     public ResponseEntity<ApiResponse<PageResponse<StaffResponse>>> searchStaff(
             @ModelAttribute StaffSearchCriteria criteria,
@@ -133,7 +124,6 @@ public class StaffController {
     }
 
     @DeleteMapping("/{staffId}")
-    @PreAuthorize("hasAuthority('STAFF_DELETE')")
     @Operation(summary = "Soft delete a staff member")
     public ResponseEntity<Void> deleteStaff(@PathVariable Long staffId) {
         staffService.deleteStaff(staffId);

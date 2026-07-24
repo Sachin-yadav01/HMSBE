@@ -22,13 +22,19 @@ public class EmployeeCodeGenerator {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public String generateCode() {
-        EmployeeCodeSequence sequence = sequenceRepository.getSequenceForUpdate()
-                .orElseThrow(() -> new IllegalStateException("Employee Code Sequence not initialized in DB"));
-        
+        EmployeeCodeSequence sequence = sequenceRepository.findFirstByOrderByIdAsc()
+                .orElseGet(this::initializeSequence);
+
         Long currentVal = sequence.getNextVal();
         sequence.setNextVal(currentVal + 1);
         sequenceRepository.save(sequence);
-        
+
         return String.format("%s-%06d", prefix, currentVal);
+    }
+
+    private EmployeeCodeSequence initializeSequence() {
+        EmployeeCodeSequence sequence = new EmployeeCodeSequence();
+        sequence.setNextVal(1L);
+        return sequenceRepository.saveAndFlush(sequence);
     }
 }

@@ -9,16 +9,15 @@ import com.example.HospitaManagmentSystemDemo.dto.response.StaffResponse;
 import com.example.HospitaManagmentSystemDemo.entity.Staff;
 import com.example.HospitaManagmentSystemDemo.exception.BusinessException;
 import com.example.HospitaManagmentSystemDemo.mapper.StaffMapper;
+import com.example.HospitaManagmentSystemDemo.repository.DepartmentRepository;
 import com.example.HospitaManagmentSystemDemo.repository.StaffRepository;
 import com.example.HospitaManagmentSystemDemo.security.CurrentUserProvider;
 import com.example.HospitaManagmentSystemDemo.service.EmployeeCodeGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -34,6 +33,9 @@ class StaffServiceImplTest {
     private StaffRepository staffRepository;
 
     @Mock
+    private DepartmentRepository departmentRepository;
+
+    @Mock
     private StaffMapper staffMapper;
 
     @Mock
@@ -42,12 +44,18 @@ class StaffServiceImplTest {
     @Mock
     private CurrentUserProvider currentUserProvider;
 
-    @InjectMocks
     private StaffServiceImpl staffService;
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(staffService, "minWorkingAge", 18);
+        staffService = new StaffServiceImpl(
+                staffRepository,
+                departmentRepository,
+                staffMapper,
+                codeGenerator,
+                currentUserProvider,
+                18
+        );
     }
 
     @Test

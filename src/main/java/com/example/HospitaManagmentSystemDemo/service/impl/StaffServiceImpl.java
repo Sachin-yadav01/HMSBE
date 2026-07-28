@@ -9,9 +9,11 @@ import com.example.HospitaManagmentSystemDemo.dto.request.StaffStatusUpdateReque
 import com.example.HospitaManagmentSystemDemo.dto.request.StaffUpdateRequest;
 import com.example.HospitaManagmentSystemDemo.dto.response.PageResponse;
 import com.example.HospitaManagmentSystemDemo.dto.response.StaffResponse;
+import com.example.HospitaManagmentSystemDemo.entity.Department;
 import com.example.HospitaManagmentSystemDemo.entity.Staff;
 import com.example.HospitaManagmentSystemDemo.exception.BusinessException;
 import com.example.HospitaManagmentSystemDemo.mapper.StaffMapper;
+import com.example.HospitaManagmentSystemDemo.repository.DepartmentRepository;
 import com.example.HospitaManagmentSystemDemo.repository.StaffRepository;
 import com.example.HospitaManagmentSystemDemo.security.CurrentUserProvider;
 import com.example.HospitaManagmentSystemDemo.service.EmployeeCodeGenerator;
@@ -36,6 +38,7 @@ public class StaffServiceImpl implements StaffService {
     private static final Logger log = LoggerFactory.getLogger(StaffServiceImpl.class);
 
     private final StaffRepository staffRepository;
+    private final DepartmentRepository departmentRepository;
     private final StaffMapper staffMapper;
     private final EmployeeCodeGenerator codeGenerator;
     private final CurrentUserProvider currentUserProvider;
@@ -43,11 +46,13 @@ public class StaffServiceImpl implements StaffService {
 
     public StaffServiceImpl(
             StaffRepository staffRepository,
+            DepartmentRepository departmentRepository,
             StaffMapper staffMapper,
             EmployeeCodeGenerator codeGenerator,
             CurrentUserProvider currentUserProvider,
             @Value("${hms.staff.minimum-working-age:18}") int minWorkingAge) {
         this.staffRepository = staffRepository;
+        this.departmentRepository = departmentRepository;
         this.staffMapper = staffMapper;
         this.codeGenerator = codeGenerator;
         this.currentUserProvider = currentUserProvider;
@@ -70,7 +75,7 @@ public class StaffServiceImpl implements StaffService {
         Staff savedStaff = staffRepository.save(staff);
         log.info("Staff registered successfully. staffId={}, employeeCode={}", savedStaff.getId(), savedStaff.getEmployeeCode());
 
-        return staffMapper.toResponse(savedStaff);
+        return enrichResponse(staffMapper.toResponse(savedStaff));
     }
 
     @Override
@@ -78,6 +83,7 @@ public class StaffServiceImpl implements StaffService {
     public StaffResponse getStaffById(Long staffId) {
         return staffRepository.findByIdAndDeletedFalse(staffId)
                 .map(staffMapper::toResponse)
+                .map(this::enrichResponse)
                 .orElseThrow(() -> new EntityNotFoundException("Staff not found with ID: " + staffId));
     }
 
@@ -86,6 +92,7 @@ public class StaffServiceImpl implements StaffService {
     public StaffResponse getStaffByEmployeeCode(String employeeCode) {
         return staffRepository.findByEmployeeCodeAndDeletedFalse(employeeCode)
                 .map(staffMapper::toResponse)
+                .map(this::enrichResponse)
                 .orElseThrow(() -> new EntityNotFoundException("Staff not found with Employee Code: " + employeeCode));
     }
 
@@ -102,7 +109,7 @@ public class StaffServiceImpl implements StaffService {
         Staff updatedStaff = staffRepository.save(staff);
         log.info("Staff updated successfully. staffId={}", updatedStaff.getId());
 
-        return staffMapper.toResponse(updatedStaff);
+        return enrichResponse(staffMapper.toResponse(updatedStaff));
     }
 
     @Override
@@ -140,7 +147,7 @@ public class StaffServiceImpl implements StaffService {
         Staff updatedStaff = staffRepository.save(staff);
         log.info("Staff partially updated successfully. staffId={}", updatedStaff.getId());
 
-        return staffMapper.toResponse(updatedStaff);
+        return enrichResponse(staffMapper.toResponse(updatedStaff));
     }
 
     @Override
@@ -163,7 +170,7 @@ public class StaffServiceImpl implements StaffService {
         
         Staff updatedStaff = staffRepository.save(staff);
         log.info("Staff status updated successfully. staffId={}, newStatus={}", updatedStaff.getId(), request.getStatus());
-        return staffMapper.toResponse(updatedStaff);
+        return enrichResponse(staffMapper.toResponse(updatedStaff));
     }
 
     @Override
@@ -184,7 +191,7 @@ public class StaffServiceImpl implements StaffService {
 
         Staff updatedStaff = staffRepository.save(staff);
         log.info("Staff activation updated successfully. staffId={}, isActive={}", updatedStaff.getId(), request.getActive());
-        return staffMapper.toResponse(updatedStaff);
+        return enrichResponse(staffMapper.toResponse(updatedStaff));
     }
 
     @Override
@@ -192,7 +199,7 @@ public class StaffServiceImpl implements StaffService {
     public PageResponse<StaffResponse> searchStaff(StaffSearchCriteria criteria, Pageable pageable) {
         Page<Staff> page = staffRepository.findAll(StaffSpecification.buildSpecification(criteria), pageable);
         return new PageResponse<>(
-                page.getContent().stream().map(staffMapper::toResponse).toList(),
+                page.getContent().stream().map(staffMapper::toResponse).map(this::enrichResponse).toList(),
                 page.getNumber(),
                 page.getSize(),
                 page.getTotalElements(),
@@ -221,6 +228,16 @@ public class StaffServiceImpl implements StaffService {
     private Staff getStaffEntity(Long staffId) {
         return staffRepository.findByIdAndDeletedFalse(staffId)
                 .orElseThrow(() -> new EntityNotFoundException("Staff not found with ID: " + staffId));
+    }
+
+    private StaffResponse enrichResponse(StaffResponse response) {
+        if (response == null || response.getDepartmentId() == null) {
+            return response;
+        }
+        departmentRepository.findByIdAndDeletedFalse(response.getDepartmentId())
+                .map(Department::getName)
+                .ifPresent(response::setDepartmentName);
+        return response;
     }
 
     private void validateAge(LocalDate dateOfBirth) {

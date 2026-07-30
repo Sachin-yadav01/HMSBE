@@ -20,6 +20,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/v1/payment-modes")
@@ -29,7 +30,7 @@ public class PaymentModeController {
     private static final List<String> ALLOWED_SORT_FIELDS = Arrays.asList("id", "code", "name", "createdOn");
 
     private final PaymentModeService service;
-
+    private static final Logger log = Logger.getLogger(PaymentModeController.class.getName());
     public PaymentModeController(PaymentModeService service) {
         this.service = service;
     }
@@ -37,6 +38,7 @@ public class PaymentModeController {
     @PostMapping
     @Operation(summary = "Create payment modes")
     public ResponseEntity<ApiResponse<PaymentModeResponse>> create(@Valid @RequestBody PaymentModeCreateRequest request) {
+        log.info("received request to create payment mode");
         PaymentModeResponse response = service.create(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(response.getId()).toUri();
@@ -46,18 +48,21 @@ public class PaymentModeController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<PaymentModeResponse>> getById(@PathVariable Long id) {
+        log.info("received request to get Payment mode by id");
         return ResponseEntity.ok(ApiResponse.success("PaymentMode retrieved successfully", service.getById(id)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<PaymentModeResponse>> update(
             @PathVariable Long id, @Valid @RequestBody PaymentModeUpdateRequest request) {
+        log.info("received request to update payment mode");
         return ResponseEntity.ok(ApiResponse.success("PaymentMode updated successfully", service.update(id, request)));
     }
 
     @PatchMapping("/{id}/activation")
     public ResponseEntity<ApiResponse<PaymentModeResponse>> updateActivation(
             @PathVariable Long id, @Valid @RequestBody MasterActivationRequest request) {
+        log.info("received request to create payment mode");
         return ResponseEntity.ok(ApiResponse.success("PaymentMode activation updated successfully",
                 service.updateActivation(id, request)));
     }
@@ -85,6 +90,7 @@ public class PaymentModeController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
+        log.info("received request to delete payment mode");
         service.delete(id);
         return ResponseEntity.noContent().build();
     }

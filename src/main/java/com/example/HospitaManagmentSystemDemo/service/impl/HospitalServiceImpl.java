@@ -9,11 +9,13 @@ import com.example.HospitaManagmentSystemDemo.service.HospitalService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.logging.Logger;
+
 @Service
 public class HospitalServiceImpl implements HospitalService {
 
     private static final Long PROFILE_ID = 1L;
-
+    private static final Logger log =Logger.getLogger(HospitalServiceImpl.class.getName());
     private final HospitalRepository hospitalRepository;
     private final HospitalMapper hospitalMapper;
 
@@ -25,14 +27,17 @@ public class HospitalServiceImpl implements HospitalService {
     @Override
     @Transactional
     public HospitalResponse getProfile() {
+        log.info("Received getProfile request");
         return hospitalMapper.toResponse(getOrCreateProfile());
     }
 
     @Override
     @Transactional
     public HospitalResponse updateProfile(HospitalUpdateRequest request) {
+        log.info("Received request to update hospital");
         Hospital hospital = getOrCreateProfile();
         hospitalMapper.updateEntity(hospital, request);
+        log.info("Entity updated");
         return hospitalMapper.toResponse(hospitalRepository.save(hospital));
     }
 

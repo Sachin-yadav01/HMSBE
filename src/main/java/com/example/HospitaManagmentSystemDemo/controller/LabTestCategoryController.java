@@ -11,6 +11,7 @@ import com.example.HospitaManagmentSystemDemo.service.LabTestCategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/lab-test-categories")
 @Tag(name = "Lab Test Categories")
+@Slf4j
 public class LabTestCategoryController {
 
     private static final List<String> ALLOWED_SORT_FIELDS = Arrays.asList("id", "code", "name", "createdOn");
@@ -37,9 +39,15 @@ public class LabTestCategoryController {
     @PostMapping
     @Operation(summary = "Create lab test categories")
     public ResponseEntity<ApiResponse<LabTestCategoryResponse>> create(@Valid @RequestBody LabTestCategoryCreateRequest request) {
+
+        log.info("Received request to create lab test categories");
+
         LabTestCategoryResponse response = service.create(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(response.getId()).toUri();
+
+        log.info("Lab Test Category created successfully with id={}", response.getId());
+
         return ResponseEntity.created(location)
                 .body(ApiResponse.success("LabTestCategory created successfully", response));
     }

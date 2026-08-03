@@ -11,6 +11,7 @@ import com.example.HospitaManagmentSystemDemo.service.MedicineRouteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/medicine-routes")
 @Tag(name = "Medicine Routes")
+@Slf4j
 public class MedicineRouteController {
 
     private static final List<String> ALLOWED_SORT_FIELDS = Arrays.asList("id", "code", "name", "createdOn");
@@ -37,9 +39,15 @@ public class MedicineRouteController {
     @PostMapping
     @Operation(summary = "Create medicine routes")
     public ResponseEntity<ApiResponse<MedicineRouteResponse>> create(@Valid @RequestBody MedicineRouteCreateRequest request) {
+
+        log.info("Received request to create medicine routes");
+
         MedicineRouteResponse response = service.create(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(response.getId()).toUri();
+
+        log.info("Medicine Route created successfully with id={}", response.getId());
+
         return ResponseEntity.created(location)
                 .body(ApiResponse.success("MedicineRoute created successfully", response));
     }

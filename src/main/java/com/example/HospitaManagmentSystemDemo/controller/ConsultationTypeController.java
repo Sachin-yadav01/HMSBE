@@ -8,6 +8,7 @@ import com.example.HospitaManagmentSystemDemo.dto.response.ApiResponse;
 import com.example.HospitaManagmentSystemDemo.dto.response.ConsultationTypeResponse;
 import com.example.HospitaManagmentSystemDemo.dto.response.PageResponse;
 import com.example.HospitaManagmentSystemDemo.service.ConsultationTypeService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
@@ -31,6 +32,7 @@ public class ConsultationTypeController {
     public ConsultationTypeController(ConsultationTypeService service) { this.service = service; }
 
     @PostMapping
+    @Operation(summary = "Create a consultation type")
     public ResponseEntity<ApiResponse<ConsultationTypeResponse>> create(@Valid @RequestBody ConsultationTypeCreateRequest request) {
         ConsultationTypeResponse response = service.create(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.getId()).toUri();
@@ -38,26 +40,31 @@ public class ConsultationTypeController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get a consultation type by ID")
     public ResponseEntity<ApiResponse<ConsultationTypeResponse>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success("Consultation type retrieved successfully", service.getById(id)));
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update a consultation type")
     public ResponseEntity<ApiResponse<ConsultationTypeResponse>> update(@PathVariable Long id, @Valid @RequestBody ConsultationTypeUpdateRequest request) {
         return ResponseEntity.ok(ApiResponse.success("Consultation type updated successfully", service.update(id, request)));
     }
 
     @PatchMapping("/{id}/activation")
+    @Operation(summary = "Activate or deactivate a consultation type")
     public ResponseEntity<ApiResponse<ConsultationTypeResponse>> updateActivation(@PathVariable Long id, @Valid @RequestBody MasterActivationRequest request) {
         return ResponseEntity.ok(ApiResponse.success("Consultation type activation updated successfully", service.updateActivation(id, request)));
     }
 
     @GetMapping("/active")
+    @Operation(summary = "List all active consultation types")
     public ResponseEntity<ApiResponse<List<ConsultationTypeResponse>>> listActive() {
         return ResponseEntity.ok(ApiResponse.success("Active consultation types retrieved successfully", service.listActive()));
     }
 
     @GetMapping
+    @Operation(summary = "Search and filter consultation types with pagination")
     public ResponseEntity<ApiResponse<PageResponse<ConsultationTypeResponse>>> search(
             @ModelAttribute MasterSearchCriteria criteria,
             @RequestParam(defaultValue = "0") int page,
@@ -72,6 +79,7 @@ public class ConsultationTypeController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a consultation type")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();

@@ -45,17 +45,20 @@ public class DepartmentController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get a department by ID")
     public ResponseEntity<ApiResponse<DepartmentResponse>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success("Department retrieved successfully", service.getById(id)));
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update a department")
     public ResponseEntity<ApiResponse<DepartmentResponse>> update(
             @PathVariable Long id, @Valid @RequestBody DepartmentUpdateRequest request) {
         return ResponseEntity.ok(ApiResponse.success("Department updated successfully", service.update(id, request)));
     }
 
     @PatchMapping("/{id}/activation")
+    @Operation(summary = "Activate or deactivate a department")
     public ResponseEntity<ApiResponse<DepartmentResponse>> updateActivation(
             @PathVariable Long id, @Valid @RequestBody MasterActivationRequest request) {
         return ResponseEntity.ok(ApiResponse.success("Department activation updated successfully",
@@ -63,12 +66,14 @@ public class DepartmentController {
     }
 
     @GetMapping("/active")
+    @Operation(summary = "List all active departments")
     public ResponseEntity<ApiResponse<List<DepartmentResponse>>> listActive() {
         return ResponseEntity.ok(ApiResponse.success("Active departments retrieved successfully",
                 service.listActive()));
     }
 
     @GetMapping
+    @Operation(summary = "Search and filter departments with pagination")
     public ResponseEntity<ApiResponse<PageResponse<DepartmentResponse>>> search(
             @ModelAttribute MasterSearchCriteria criteria,
             @RequestParam(defaultValue = "0") int page,
@@ -84,6 +89,7 @@ public class DepartmentController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a department")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();

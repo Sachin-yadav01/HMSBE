@@ -45,17 +45,20 @@ public class UnitController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get a unit by ID")
     public ResponseEntity<ApiResponse<UnitResponse>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success("Unit retrieved successfully", service.getById(id)));
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update a unit")
     public ResponseEntity<ApiResponse<UnitResponse>> update(
             @PathVariable Long id, @Valid @RequestBody UnitUpdateRequest request) {
         return ResponseEntity.ok(ApiResponse.success("Unit updated successfully", service.update(id, request)));
     }
 
     @PatchMapping("/{id}/activation")
+    @Operation(summary = "Activate or deactivate a unit")
     public ResponseEntity<ApiResponse<UnitResponse>> updateActivation(
             @PathVariable Long id, @Valid @RequestBody MasterActivationRequest request) {
         return ResponseEntity.ok(ApiResponse.success("Unit activation updated successfully",
@@ -63,12 +66,14 @@ public class UnitController {
     }
 
     @GetMapping("/active")
+    @Operation(summary = "List all active units")
     public ResponseEntity<ApiResponse<List<UnitResponse>>> listActive() {
         return ResponseEntity.ok(ApiResponse.success("Active units retrieved successfully",
                 service.listActive()));
     }
 
     @GetMapping
+    @Operation(summary = "Search and filter units with pagination")
     public ResponseEntity<ApiResponse<PageResponse<UnitResponse>>> search(
             @ModelAttribute MasterSearchCriteria criteria,
             @RequestParam(defaultValue = "0") int page,
@@ -84,6 +89,7 @@ public class UnitController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a unit")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();

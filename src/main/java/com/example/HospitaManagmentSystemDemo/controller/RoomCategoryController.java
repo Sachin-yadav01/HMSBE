@@ -10,6 +10,9 @@ import com.example.HospitaManagmentSystemDemo.dto.response.RoomCategoryResponse;
 import com.example.HospitaManagmentSystemDemo.service.RoomCategoryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +22,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
-
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/room-categories")
 @Tag(name = "Room Categories")
@@ -33,27 +36,33 @@ public class RoomCategoryController {
     @PostMapping
     public ResponseEntity<ApiResponse<RoomCategoryResponse>> create(@Valid @RequestBody RoomCategoryCreateRequest request) {
         RoomCategoryResponse response = service.create(request);
+        log.info("Received request to create Room Category");
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.getId()).toUri();
+        log.info("Room category created successfully with id={}", response.getId());
         return ResponseEntity.created(location).body(ApiResponse.success("Room category created successfully", response));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<RoomCategoryResponse>> getById(@PathVariable Long id) {
+        log.info("Received request to get Room Category by id");
         return ResponseEntity.ok(ApiResponse.success("Room category retrieved successfully", service.getById(id)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<RoomCategoryResponse>> update(@PathVariable Long id, @Valid @RequestBody RoomCategoryUpdateRequest request) {
+        log.info("Received request to update Room Category");
         return ResponseEntity.ok(ApiResponse.success("Room category updated successfully", service.update(id, request)));
     }
 
     @PatchMapping("/{id}/activation")
     public ResponseEntity<ApiResponse<RoomCategoryResponse>> updateActivation(@PathVariable Long id, @Valid @RequestBody MasterActivationRequest request) {
+        log.info("Received request to update Room Category activation");
         return ResponseEntity.ok(ApiResponse.success("Room category activation updated successfully", service.updateActivation(id, request)));
     }
 
     @GetMapping("/active")
     public ResponseEntity<ApiResponse<List<RoomCategoryResponse>>> listActive() {
+        log.info("Received request for Active Room Categories");
         return ResponseEntity.ok(ApiResponse.success("Active room categories retrieved successfully", service.listActive()));
     }
 
@@ -74,6 +83,7 @@ public class RoomCategoryController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
+        log.info("Received request to delete Room Category with id="+id);
         return ResponseEntity.noContent().build();
     }
 }

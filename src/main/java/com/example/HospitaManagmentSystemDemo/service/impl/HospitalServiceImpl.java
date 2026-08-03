@@ -6,14 +6,16 @@ import com.example.HospitaManagmentSystemDemo.entity.Hospital;
 import com.example.HospitaManagmentSystemDemo.mapper.HospitalMapper;
 import com.example.HospitaManagmentSystemDemo.repository.HospitalRepository;
 import com.example.HospitaManagmentSystemDemo.service.HospitalService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.logging.Logger;
+@Slf4j
 @Service
 public class HospitalServiceImpl implements HospitalService {
 
     private static final Long PROFILE_ID = 1L;
-
     private final HospitalRepository hospitalRepository;
     private final HospitalMapper hospitalMapper;
 
@@ -25,14 +27,17 @@ public class HospitalServiceImpl implements HospitalService {
     @Override
     @Transactional
     public HospitalResponse getProfile() {
+        log.info("Received getProfile request");
         return hospitalMapper.toResponse(getOrCreateProfile());
     }
 
     @Override
     @Transactional
     public HospitalResponse updateProfile(HospitalUpdateRequest request) {
+        log.info("Received request to update hospital");
         Hospital hospital = getOrCreateProfile();
         hospitalMapper.updateEntity(hospital, request);
+        log.info("Entity updated");
         return hospitalMapper.toResponse(hospitalRepository.save(hospital));
     }
 

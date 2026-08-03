@@ -10,6 +10,9 @@ import com.example.HospitaManagmentSystemDemo.dto.response.RoomCategoryResponse;
 import com.example.HospitaManagmentSystemDemo.service.RoomCategoryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +22,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
-
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/room-categories")
 @Tag(name = "Room Categories")
@@ -28,7 +30,6 @@ public class RoomCategoryController {
 
     private static final List<String> ALLOWED_SORT_FIELDS = Arrays.asList("id", "code", "name", "createdOn");
     private final RoomCategoryService service;
-    private static final Logger log = Logger.getLogger(RoomCategoryController.class.getName());
 
     public RoomCategoryController(RoomCategoryService service) { this.service = service; }
 
@@ -37,7 +38,7 @@ public class RoomCategoryController {
         RoomCategoryResponse response = service.create(request);
         log.info("Received request to create Room Category");
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.getId()).toUri();
-        log.info("Room category created successfully");
+        log.info("Room category created successfully with id={}", response.getId());
         return ResponseEntity.created(location).body(ApiResponse.success("Room category created successfully", response));
     }
 
@@ -82,6 +83,7 @@ public class RoomCategoryController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
+        log.info("Received request to delete Room Category with id="+id);
         return ResponseEntity.noContent().build();
     }
 }

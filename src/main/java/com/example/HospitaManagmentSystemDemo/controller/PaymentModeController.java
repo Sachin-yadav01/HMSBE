@@ -11,6 +11,7 @@ import com.example.HospitaManagmentSystemDemo.service.PaymentModeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
-
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/payment-modes")
 @Tag(name = "Payment Modes")
@@ -30,7 +31,6 @@ public class PaymentModeController {
     private static final List<String> ALLOWED_SORT_FIELDS = Arrays.asList("id", "code", "name", "createdOn");
 
     private final PaymentModeService service;
-    private static final Logger log = Logger.getLogger(PaymentModeController.class.getName());
     public PaymentModeController(PaymentModeService service) {
         this.service = service;
     }
@@ -62,7 +62,7 @@ public class PaymentModeController {
     @PatchMapping("/{id}/activation")
     public ResponseEntity<ApiResponse<PaymentModeResponse>> updateActivation(
             @PathVariable Long id, @Valid @RequestBody MasterActivationRequest request) {
-        log.info("received request to create payment mode");
+        log.info("received request to update payment mode activation");
         return ResponseEntity.ok(ApiResponse.success("PaymentMode activation updated successfully",
                 service.updateActivation(id, request)));
     }
